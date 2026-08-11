@@ -1,83 +1,125 @@
-import { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Image, Button, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, ScrollView } from 'react-native';
 
-const produtosMock = [
-  { id: '1', nome: 'Cadeira Confort Plus', preco: 'R$ 349,90', estoque: 5, imagem: require('./assets/produto-cadeira.jpg') },
-  { id: '2', nome: 'Mesa para Escritório Compacta', preco: 'R$ 589,00', estoque: 2, imagem: require('./assets/produto-mesa.jpg') },
-  { id: '3', nome: 'Luminária de Mesa LED', preco: 'R$ 79,90', estoque: 10, imagem: require('./assets/produto-luminaria.jpg') },
-  { id: '4', nome: 'Suporte para Notebook', preco: 'R$ 129,90', estoque: 0, imagem: require('./assets/produto-suporte.jpg') },
-];
-
-type ProdutoProps = {
-  produto: {
-    id: string;
-    nome: string;
-    preco: string;
-    estoque: number;
-    imagem: any;
-  }
+type Ponto = {
+  id: string;
+  nome: string;
+  endereco: string;
+  diasHorarios: string;
+  recebeDistribui: string;
 };
 
-function Produto({ produto }: ProdutoProps) {
-  const [quantidade, setQuantidade] = useState(0);
+const pontosMock: Ponto[] = [
+  {
+    id: '1',
+    nome: 'Ponto Centro',
+    endereco: 'Rua das Flores, 123 - Centro',
+    diasHorarios: 'Segunda a sexta, 8h às 17h',
+    recebeDistribui: 'Recebe alimentos não perecíveis e roupas',
+  },
+  {
+    id: '2',
+    nome: 'Ponto Vila Nova',
+    endereco: 'Av. Brasil, 456 - Vila Nova',
+    diasHorarios: 'Sábados, 9h às 13h',
+    recebeDistribui: 'Distribui cestas básicas para famílias cadastradas',
+  },
+  {
+    id: '3',
+    nome: 'Ponto Jardim das Flores',
+    endereco: 'Rua Tiradentes, 789 - Jardim das Flores',
+    diasHorarios: 'Terças e quintas, 14h às 18h',
+    recebeDistribui: 'Recebe roupas e calçados, distribui agasalhos no inverno',
+  },
+];
 
-  const adicionarItem = () => {
-    if (quantidade < produto.estoque) {
-      setQuantidade(quantidade + 1);
-    }
-  };
-
+function PontoItem({ ponto }: { ponto: Ponto }) {
   return (
-    <View style={styles.itemProduto}>
-      <Image source={produto.imagem} style={{ width: 50, height: 50, marginBottom: 10 }} />
-      
-      <Text>Produto: {produto.nome}</Text>
-      <Text>Preço: {produto.preco}</Text>
-      <Text>Estoque da loja: {produto.estoque}</Text>
-      
-      <Text style={{ marginTop: 10 }}>Quantidade no carrinho: {quantidade}</Text>
-      
-      <Button 
-        title="Adicionar +1" 
-        onPress={adicionarItem} 
-        disabled={quantidade >= produto.estoque}
-      />
+    <View style={styles.itemLista}>
+      <Text style={styles.itemNome}>{ponto.nome}</Text>
     </View>
   );
 }
 
+function DetalhePonto({ ponto }: { ponto: Ponto }) {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.nome}>{ponto.nome}</Text>
+      <Text style={styles.campo}>Endereço: {ponto.endereco}</Text>
+      <Text style={styles.campo}>Dias e horários: {ponto.diasHorarios}</Text>
+      <Text style={styles.campo}>Recebe/Distribui: {ponto.recebeDistribui}</Text>
+    </View>
+  );
+}
+
+function TelaListaPontos() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.titulo}>Pontos de Coleta e Distribuição</Text>
+      {pontosMock.map((ponto) => (
+        <PontoItem key={ponto.id} ponto={ponto} />
+      ))}
+    </View>
+  );
+}
+
+function TelaDetalhePonto() {
+  return <DetalhePonto ponto={pontosMock[0]} />;
+}
+
 export default function App() {
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.titulo}>Minha Primeira Loja</Text>
-      
-      {produtosMock.map((item) => (
-        <Produto key={item.id} produto={item} />
-      ))}
-      
+    <ScrollView style={styles.scroll}>
       <StatusBar style="auto" />
+      <TelaListaPontos />
+      <Text style={styles.separador}>Detalhe do primeiro ponto</Text>
+      <TelaDetalhePonto />
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  scroll: {
     flex: 1,
     backgroundColor: '#fff',
     paddingTop: 60,
+  },
+  container: {
+    flex: 1,
     paddingHorizontal: 20,
   },
   titulo: {
     fontSize: 20,
     fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 12,
   },
-  itemProduto: {
-    marginBottom: 20,
-    padding: 15,
+  separador: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 20,
+    marginBottom: 8,
+    paddingHorizontal: 20,
+    color: '#1B3A5C',
+  },
+  itemLista: {
+    marginBottom: 10,
+    padding: 12,
     borderWidth: 1,
-    borderColor: '#000',
-  }
+    borderColor: '#ccc',
+    borderRadius: 6,
+  },
+  itemNome: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  nome: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#1B3A5C',
+    marginBottom: 10,
+  },
+  campo: {
+    fontSize: 15,
+    marginTop: 6,
+  },
 });
