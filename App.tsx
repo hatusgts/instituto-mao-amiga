@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, FlatList } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
@@ -35,6 +35,41 @@ const pontosMock: Ponto[] = [
     diasHorarios: 'Terças e quintas, 14h às 18h',
     recebeDistribui: 'Recebe roupas e calçados, distribui agasalhos no inverno',
   },
+  {
+    id: '4',
+    nome: 'Ponto Bela Vista',
+    endereco: 'Rua Sete de Setembro, 245 - Bela Vista',
+    diasHorarios: 'Quartas, 13h às 17h',
+    recebeDistribui: 'Recebe leite e produtos de higiene',
+  },
+  {
+    id: '5',
+    nome: 'Ponto São José',
+    endereco: 'Avenida Getúlio Vargas, 980 - São José',
+    diasHorarios: 'Segundas e quartas, 9h às 12h',
+    recebeDistribui: 'Distribui cestas básicas e material escolar',
+  },
+  {
+    id: '6',
+    nome: 'Ponto Industrial',
+    endereco: 'Rua dos Trabalhadores, 310 - Distrito Industrial',
+    diasHorarios: 'Sextas, 8h às 11h',
+    recebeDistribui: 'Recebe roupas de frio e cobertores',
+  },
+  {
+    id: '7',
+    nome: 'Ponto Boa Esperança',
+    endereco: 'Rua Boa Esperança, 55 - Boa Esperança',
+    diasHorarios: 'Terças, 15h às 18h',
+    recebeDistribui: 'Distribui alimentos não perecíveis para famílias cadastradas',
+  },
+  {
+    id: '8',
+    nome: 'Ponto Nova Aliança',
+    endereco: 'Alameda das Palmeiras, 620 - Nova Aliança',
+    diasHorarios: 'Sábados, 8h às 12h',
+    recebeDistribui: 'Recebe e distribui roupas, calçados e brinquedos',
+  },
 ];
 
 function PontoItem({ ponto, onPress }: { ponto: Ponto; onPress: () => void }) {
@@ -58,18 +93,19 @@ function DetalhePonto({ ponto }: { ponto: Ponto }) {
 
 function TelaListaPontos({ navigation }: any) {
   return (
-    <ScrollView style={styles.scroll}>
-      <View style={styles.container}>
-        <Text style={styles.titulo}>Pontos de Coleta e Distribuição</Text>
-        {pontosMock.map((ponto) => (
+    <View style={[styles.scroll, styles.container]}>
+      <Text style={styles.titulo}>Pontos de Coleta e Distribuição</Text>
+      <FlatList
+        data={pontosMock}
+        keyExtractor={(ponto) => ponto.id}
+        renderItem={({ item }) => (
           <PontoItem
-            key={ponto.id}
-            ponto={ponto}
-            onPress={() => navigation.navigate('Detalhe', { id: ponto.id })}
+            ponto={item}
+            onPress={() => navigation.navigate('Detalhe', { id: item.id })}
           />
-        ))}
-      </View>
-    </ScrollView>
+        )}
+      />
+    </View>
   );
 }
 
