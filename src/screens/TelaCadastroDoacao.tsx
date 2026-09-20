@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { pontosMock } from '../data/pontos';
 import { styles } from '../styles/styles';
 
@@ -9,12 +10,21 @@ type Erros = {
   ponto?: string;
 };
 
+const CHAVE_DOACOES = '@instituto_mao_amiga:doacoes';
+
 export function TelaCadastroDoacao() {
   const [tipo, setTipo] = useState('');
   const [quantidade, setQuantidade] = useState('');
   const [pontoId, setPontoId] = useState('');
   const [erros, setErros] = useState<Erros>({});
   const [valido, setValido] = useState(false);
+  const [doacoes, setDoacoes] = useState<any[]>([]);
+
+  useEffect(() => {
+    AsyncStorage.getItem(CHAVE_DOACOES).then((salvo) => {
+      if (salvo) setDoacoes(JSON.parse(salvo));
+    });
+  }, []);
 
   function validar() {
     const novos: Erros = {};
@@ -37,7 +47,17 @@ export function TelaCadastroDoacao() {
     }
 
     setErros(novos);
-    setValido(Object.keys(novos).length === 0);
+    const ok = Object.keys(novos).length === 0;
+    setValido(ok);
+
+    if (ok) {
+      const doacao = { id: Date.now(), tipo, quantidade, pontoId };
+      setDoacoes((atual) => {
+        const novo = [...atual, doacao];
+        AsyncStorage.setItem(CHAVE_DOACOES, JSON.stringify(novo));
+        return novo;
+      });
+    }
   }
 
   function alterar(set: (valor: string) => void) {

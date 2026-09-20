@@ -10,6 +10,9 @@ export function TelaListaPontos({ navigation }: any) {
       <TouchableOpacity style={styles.botaoSecundario} onPress={() => navigation.navigate('Cadastro')}>
         <Text style={styles.botaoSecundarioTexto}>Cadastrar doação</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={styles.botaoSecundario} onPress={() => navigation.navigate('Doacoes')}>
+        <Text style={styles.botaoSecundarioTexto}>Ver doações cadastradas</Text>
+      </TouchableOpacity>
       <FlatList
         data={pontosMock}
         keyExtractor={(ponto) => ponto.id}
