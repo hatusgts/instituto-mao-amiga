@@ -11,7 +11,7 @@ export function TelaListaPontos({ navigation }: any) {
         <Text style={styles.botaoSecundarioTexto}>Cadastrar doação</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.botaoSecundario} onPress={() => navigation.navigate('Doacoes')}>
-        <Text style={styles.botaoSecundarioTexto}>Ver doações cadastradas</Text>
+        <Text style={styles.botaoSecundarioTexto}>Ver Minhas Doações</Text>
       </TouchableOpacity>
       <FlatList
         data={pontosMock}
