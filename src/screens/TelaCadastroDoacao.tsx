@@ -51,7 +51,7 @@ export function TelaCadastroDoacao() {
     setValido(ok);
 
     if (ok) {
-      const doacao = { id: Date.now(), tipo, quantidade, pontoId };
+      const doacao = { id: Date.now(), tipo, quantidade, pontoId, data: new Date().toISOString() };
       setDoacoes((atual) => {
         const novo = [...atual, doacao];
         AsyncStorage.setItem(CHAVE_DOACOES, JSON.stringify(novo));

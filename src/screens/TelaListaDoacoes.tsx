@@ -1,13 +1,13 @@
 import { useCallback, useState } from 'react';
-import { FlatList, Text, View } from 'react-native';
+import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { pontosMock } from '../data/pontos';
+import { ItemDoacao } from '../components/ItemDoacao';
 import { styles } from '../styles/styles';
 
 const CHAVE_DOACOES = '@instituto_mao_amiga:doacoes';
 
-export function TelaListaDoacoes() {
+export function TelaListaDoacoes({ navigation }: any) {
   const [doacoes, setDoacoes] = useState<any[]>([]);
 
   useFocusEffect(
@@ -18,21 +18,25 @@ export function TelaListaDoacoes() {
     }, [])
   );
 
+  if (doacoes.length === 0) {
+    return (
+      <View style={[styles.scroll, styles.container]}>
+        <Text style={styles.titulo}>Minhas Doações</Text>
+        <Text style={styles.campo}>Nenhuma doação cadastrada ainda.</Text>
+        <TouchableOpacity style={styles.botao} onPress={() => navigation.navigate('Cadastro')}>
+          <Text style={styles.botaoTexto}>Cadastrar doação</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <View style={[styles.scroll, styles.container]}>
-      <Text style={styles.titulo}>Doações Cadastradas</Text>
+      <Text style={styles.titulo}>Minhas Doações</Text>
       <FlatList
         data={doacoes}
         keyExtractor={(item) => String(item.id)}
-        renderItem={({ item }) => {
-          const ponto = pontosMock.find((p) => p.id === item.pontoId);
-          return (
-            <View style={styles.itemLista}>
-              <Text style={styles.itemNome}>{item.tipo} - {item.quantidade}</Text>
-              <Text style={styles.campo}>Destino: {ponto ? ponto.nome : 'Ponto não encontrado'}</Text>
-            </View>
-          );
-        }}
+        renderItem={({ item }) => <ItemDoacao doacao={item} />}
       />
     </View>
   );
