@@ -32,7 +32,7 @@ export default function App() {
           })}
         />
         <Stack.Screen name="Cadastro" component={TelaCadastroDoacao} options={{ title: 'Cadastrar Doação' }} />
-        <Stack.Screen name="Doacoes" component={TelaListaDoacoes} options={{ title: 'Doações Cadastradas' }} />
+        <Stack.Screen name="Doacoes" component={TelaListaDoacoes} options={{ title: 'Minhas Doações' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
