@@ -36,7 +36,12 @@ export function TelaListaDoacoes({ navigation }: any) {
       <FlatList
         data={doacoes}
         keyExtractor={(item) => String(item.id)}
-        renderItem={({ item }) => <ItemDoacao doacao={item} />}
+        renderItem={({ item }) => (
+          <ItemDoacao
+            doacao={item}
+            onPress={() => navigation.navigate('DetalheDoacao', { doacao: item })}
+          />
+        )}
       />
     </View>
   );
