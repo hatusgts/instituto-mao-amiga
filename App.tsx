@@ -6,6 +6,7 @@ import { TelaListaPontos } from './src/screens/TelaListaPontos';
 import { TelaDetalhePonto } from './src/screens/TelaDetalhePonto';
 import { TelaCadastroDoacao } from './src/screens/TelaCadastroDoacao';
 import { TelaListaDoacoes } from './src/screens/TelaListaDoacoes';
+import { TelaDetalheDoacao } from './src/screens/TelaDetalheDoacao';
 
 const Stack = createNativeStackNavigator();
 
@@ -33,6 +34,7 @@ export default function App() {
         />
         <Stack.Screen name="Cadastro" component={TelaCadastroDoacao} options={{ title: 'Cadastrar Doação' }} />
         <Stack.Screen name="Doacoes" component={TelaListaDoacoes} options={{ title: 'Minhas Doações' }} />
+        <Stack.Screen name="DetalheDoacao" component={TelaDetalheDoacao} options={{ title: 'Detalhe da Doação' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
