@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { pontosMock } from '../data/pontos';
+import { atualizarDoacao } from '../data/doacoesStorage';
 import { styles } from '../styles/styles';
 
 type Erros = {
@@ -12,10 +13,12 @@ type Erros = {
 
 const CHAVE_DOACOES = '@instituto_mao_amiga:doacoes';
 
-export function TelaCadastroDoacao() {
-  const [tipo, setTipo] = useState('');
-  const [quantidade, setQuantidade] = useState('');
-  const [pontoId, setPontoId] = useState('');
+export function TelaCadastroDoacao({ route, navigation }: any) {
+  const doacaoParaEditar = route?.params?.doacaoParaEditar;
+
+  const [tipo, setTipo] = useState(doacaoParaEditar?.tipo ?? '');
+  const [quantidade, setQuantidade] = useState(doacaoParaEditar?.quantidade ?? '');
+  const [pontoId, setPontoId] = useState(doacaoParaEditar?.pontoId ?? '');
   const [erros, setErros] = useState<Erros>({});
   const [valido, setValido] = useState(false);
   const [doacoes, setDoacoes] = useState<any[]>([]);
@@ -51,12 +54,19 @@ export function TelaCadastroDoacao() {
     setValido(ok);
 
     if (ok) {
-      const doacao = { id: Date.now(), tipo, quantidade, pontoId, data: new Date().toISOString() };
-      setDoacoes((atual) => {
-        const novo = [...atual, doacao];
-        AsyncStorage.setItem(CHAVE_DOACOES, JSON.stringify(novo));
-        return novo;
-      });
+      if (doacaoParaEditar) {
+        const doacaoAtualizada = { ...doacaoParaEditar, tipo, quantidade, pontoId };
+        atualizarDoacao(doacaoAtualizada).then(() => {
+          navigation.navigate('DetalheDoacao', { doacao: doacaoAtualizada });
+        });
+      } else {
+        const doacao = { id: Date.now(), tipo, quantidade, pontoId, data: new Date().toISOString() };
+        setDoacoes((atual) => {
+          const novo = [...atual, doacao];
+          AsyncStorage.setItem(CHAVE_DOACOES, JSON.stringify(novo));
+          return novo;
+        });
+      }
     }
   }
 
@@ -69,7 +79,7 @@ export function TelaCadastroDoacao() {
 
   return (
     <ScrollView style={styles.scroll} contentContainerStyle={styles.container}>
-      <Text style={styles.titulo}>Cadastrar Doação</Text>
+      <Text style={styles.titulo}>{doacaoParaEditar ? 'Editar Doação' : 'Cadastrar Doação'}</Text>
 
       <Text style={styles.label}>Tipo do item</Text>
       <TextInput
@@ -112,8 +122,14 @@ export function TelaCadastroDoacao() {
       {valido ? <Text style={styles.sucesso}>Formulário válido</Text> : null}
 
       <TouchableOpacity style={styles.botao} onPress={validar}>
-        <Text style={styles.botaoTexto}>Cadastrar doação</Text>
+        <Text style={styles.botaoTexto}>{doacaoParaEditar ? 'Salvar alterações' : 'Cadastrar doação'}</Text>
       </TouchableOpacity>
+
+      {doacaoParaEditar ? (
+        <TouchableOpacity style={styles.botaoSecundario} onPress={() => navigation.goBack()}>
+          <Text style={styles.botaoSecundarioTexto}>Cancelar</Text>
+        </TouchableOpacity>
+      ) : null}
     </ScrollView>
   );
 }
