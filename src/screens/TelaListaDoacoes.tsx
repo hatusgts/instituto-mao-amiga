@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ItemDoacao } from '../components/ItemDoacao';
@@ -9,6 +9,7 @@ const CHAVE_DOACOES = '@instituto_mao_amiga:doacoes';
 
 export function TelaListaDoacoes({ navigation }: any) {
   const [doacoes, setDoacoes] = useState<any[]>([]);
+  const [busca, setBusca] = useState('');
 
   useFocusEffect(
     useCallback(() => {
@@ -30,19 +31,33 @@ export function TelaListaDoacoes({ navigation }: any) {
     );
   }
 
+  const doacoesFiltradas = busca.trim()
+    ? doacoes.filter((d) => d.tipo.toLowerCase().includes(busca.toLowerCase()))
+    : doacoes;
+
   return (
     <View style={[styles.scroll, styles.container]}>
       <Text style={styles.titulo}>Minhas Doações</Text>
-      <FlatList
-        data={doacoes}
-        keyExtractor={(item) => String(item.id)}
-        renderItem={({ item }) => (
-          <ItemDoacao
-            doacao={item}
-            onPress={() => navigation.navigate('DetalheDoacao', { doacao: item })}
-          />
-        )}
+      <TextInput
+        style={styles.input}
+        value={busca}
+        onChangeText={setBusca}
+        placeholder="Buscar por tipo de item"
       />
+      {doacoesFiltradas.length === 0 ? (
+        <Text style={styles.campo}>Nenhuma doação encontrada para "{busca}".</Text>
+      ) : (
+        <FlatList
+          data={doacoesFiltradas}
+          keyExtractor={(item) => String(item.id)}
+          renderItem={({ item }) => (
+            <ItemDoacao
+              doacao={item}
+              onPress={() => navigation.navigate('DetalheDoacao', { doacao: item })}
+            />
+          )}
+        />
+      )}
     </View>
   );
 }
