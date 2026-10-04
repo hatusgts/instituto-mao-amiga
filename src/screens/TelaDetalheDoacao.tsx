@@ -34,6 +34,13 @@ export function TelaDetalheDoacao({ route, navigation }: any) {
       <Text style={styles.campo}>Destino: {ponto ? ponto.nome : 'Ponto não encontrado'}</Text>
       <Text style={styles.campo}>Data: {data}</Text>
 
+      <TouchableOpacity
+        style={styles.botaoSecundario}
+        onPress={() => navigation.navigate('Cadastro', { doacaoParaEditar: doacao })}
+      >
+        <Text style={styles.botaoSecundarioTexto}>Editar doação</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity style={styles.botao} onPress={confirmarExclusao}>
         <Text style={styles.botaoTexto}>Excluir doação</Text>
       </TouchableOpacity>
