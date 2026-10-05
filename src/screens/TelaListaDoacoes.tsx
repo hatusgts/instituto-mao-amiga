@@ -35,9 +35,25 @@ export function TelaListaDoacoes({ navigation }: any) {
     ? doacoes.filter((d) => d.tipo.toLowerCase().includes(busca.toLowerCase()))
     : doacoes;
 
+  const totaisPorTipo = doacoes.reduce((acc: any, d) => {
+    if (!acc[d.tipo]) acc[d.tipo] = { quantidade: 0, contagem: 0 };
+    acc[d.tipo].quantidade += Number(d.quantidade);
+    acc[d.tipo].contagem += 1;
+    return acc;
+  }, {});
+
+  const resumo = Object.entries(totaisPorTipo)
+    .map(([tipo, t]: any) => ({ tipo, ...t }))
+    .sort((a, b) => b.quantidade - a.quantidade);
+
   return (
     <View style={[styles.scroll, styles.container]}>
       <Text style={styles.titulo}>Minhas Doações</Text>
+      {resumo.map((item) => (
+        <Text key={item.tipo} style={styles.campo}>
+          {item.tipo}: {item.quantidade} unidades em {item.contagem} doações
+        </Text>
+      ))}
       <TextInput
         style={styles.input}
         value={busca}
