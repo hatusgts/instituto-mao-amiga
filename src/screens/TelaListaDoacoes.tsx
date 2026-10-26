@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { FlatList, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ItemDoacao } from '../components/ItemDoacao';
@@ -47,7 +47,10 @@ export function TelaListaDoacoes({ navigation }: any) {
     .sort((a, b) => b.quantidade - a.quantidade);
 
   return (
-    <View style={[styles.scroll, styles.container]}>
+    <KeyboardAvoidingView
+      style={[styles.scroll, styles.container]}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <Text style={styles.titulo}>Minhas Doações</Text>
       {resumo.map((item) => (
         <Text key={item.tipo} style={styles.campo}>
@@ -74,6 +77,6 @@ export function TelaListaDoacoes({ navigation }: any) {
           )}
         />
       )}
-    </View>
+    </KeyboardAvoidingView>
   );
 }
