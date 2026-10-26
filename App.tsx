@@ -14,14 +14,10 @@ export default function App() {
   return (
     <NavigationContainer>
       <StatusBar style="auto" />
-      <Stack.Navigator>
-        <Stack.Screen name="Lista" component={TelaListaPontos} options={{ title: 'Pontos' }} />
-        <Stack.Screen
-          name="Detalhe"
-          component={TelaDetalhePonto}
-          options={({ navigation }) => ({
-            title: 'Detalhe do Ponto',
-            headerLeft: () => (
+      <Stack.Navigator
+        screenOptions={({ navigation }) => ({
+          headerLeft: () =>
+            navigation.canGoBack() ? (
               <Pressable
                 onPress={() => navigation.goBack()}
                 hitSlop={10}
@@ -29,9 +25,11 @@ export default function App() {
               >
                 <Text style={{ fontSize: 24 }}>←</Text>
               </Pressable>
-            ),
-          })}
-        />
+            ) : undefined,
+        })}
+      >
+        <Stack.Screen name="Lista" component={TelaListaPontos} options={{ title: 'Pontos' }} />
+        <Stack.Screen name="Detalhe" component={TelaDetalhePonto} options={{ title: 'Detalhe do Ponto' }} />
         <Stack.Screen
           name="Cadastro"
           component={TelaCadastroDoacao}

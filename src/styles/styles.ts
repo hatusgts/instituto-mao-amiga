@@ -21,6 +21,8 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 6,
+    minHeight: 44,
+    justifyContent: 'center',
   },
   itemNome: {
     fontSize: 16,
@@ -49,6 +51,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     fontSize: 15,
+    minHeight: 44,
   },
   inputErro: {
     borderColor: '#C0392B',
@@ -69,6 +72,8 @@ export const styles = StyleSheet.create({
     borderRadius: 6,
     padding: 10,
     marginBottom: 8,
+    minHeight: 44,
+    justifyContent: 'center',
   },
   opcaoPontoSelecionada: {
     borderColor: '#1B3A5C',
@@ -101,7 +106,9 @@ export const styles = StyleSheet.create({
     borderRadius: 6,
     paddingVertical: 12,
     alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 16,
+    minHeight: 44,
   },
   botaoSecundarioTexto: {
     color: '#1B3A5C',

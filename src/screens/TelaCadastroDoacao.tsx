@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { pontosMock } from '../data/pontos';
 import { atualizarDoacao } from '../data/doacoesStorage';
@@ -78,7 +78,11 @@ export function TelaCadastroDoacao({ route, navigation }: any) {
   }
 
   return (
-    <ScrollView style={styles.scroll} contentContainerStyle={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.scroll}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.titulo}>{doacaoParaEditar ? 'Editar Doação' : 'Cadastrar Doação'}</Text>
 
       <Text style={styles.label}>Tipo do item</Text>
@@ -131,5 +135,6 @@ export function TelaCadastroDoacao({ route, navigation }: any) {
         </TouchableOpacity>
       ) : null}
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
