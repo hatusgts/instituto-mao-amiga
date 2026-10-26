@@ -57,7 +57,7 @@ export function TelaCadastroDoacao({ route, navigation }: any) {
       if (doacaoParaEditar) {
         const doacaoAtualizada = { ...doacaoParaEditar, tipo, quantidade, pontoId };
         atualizarDoacao(doacaoAtualizada).then(() => {
-          navigation.navigate('DetalheDoacao', { doacao: doacaoAtualizada });
+          navigation.popTo('DetalheDoacao', { doacao: doacaoAtualizada });
         });
       } else {
         const doacao = { id: Date.now(), tipo, quantidade, pontoId, data: new Date().toISOString() };
