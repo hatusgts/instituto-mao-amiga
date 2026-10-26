@@ -1,23 +1,43 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ItemDoacao } from '../components/ItemDoacao';
+import { listarDoacoes } from '../services/doacoesStorage';
+import { listarPontos } from '../services/pontosService';
+import { Doacao } from '../types/doacao';
+import { RootStackParamList } from '../types/navegacao';
+import { Ponto } from '../types/ponto';
 import { styles } from '../styles/styles';
 
-const CHAVE_DOACOES = '@instituto_mao_amiga:doacoes';
+type Props = NativeStackScreenProps<RootStackParamList, 'Doacoes'>;
 
-export function TelaListaDoacoes({ navigation }: any) {
-  const [doacoes, setDoacoes] = useState<any[]>([]);
+type Total = {
+  quantidade: number;
+  contagem: number;
+};
+
+export function TelaListaDoacoes({ navigation }: Props) {
+  const [doacoes, setDoacoes] = useState<Doacao[]>([]);
+  const [pontos, setPontos] = useState<Ponto[]>([]);
   const [busca, setBusca] = useState('');
 
   useFocusEffect(
     useCallback(() => {
-      AsyncStorage.getItem(CHAVE_DOACOES).then((salvo) => {
-        if (salvo) setDoacoes(JSON.parse(salvo));
-      });
+      listarDoacoes().then((lista) => setDoacoes(lista));
     }, [])
   );
+
+  useEffect(() => {
+    listarPontos()
+      .then((lista) => setPontos(lista))
+      .catch(() => setPontos([]));
+  }, []);
+
+  function nomeDoPonto(id: number) {
+    const ponto = pontos.find((p) => p.id === id);
+    return ponto ? ponto.nome : 'Ponto ' + id;
+  }
 
   if (doacoes.length === 0) {
     return (
@@ -32,18 +52,18 @@ export function TelaListaDoacoes({ navigation }: any) {
   }
 
   const doacoesFiltradas = busca.trim()
-    ? doacoes.filter((d) => d.tipo.toLowerCase().includes(busca.toLowerCase()))
+    ? doacoes.filter((d) => d.tipoItem.toLowerCase().includes(busca.toLowerCase()))
     : doacoes;
 
-  const totaisPorTipo = doacoes.reduce((acc: any, d) => {
-    if (!acc[d.tipo]) acc[d.tipo] = { quantidade: 0, contagem: 0 };
-    acc[d.tipo].quantidade += Number(d.quantidade);
-    acc[d.tipo].contagem += 1;
+  const totaisPorTipo = doacoes.reduce<Record<string, Total>>((acc, d) => {
+    if (!acc[d.tipoItem]) acc[d.tipoItem] = { quantidade: 0, contagem: 0 };
+    acc[d.tipoItem].quantidade += d.quantidade;
+    acc[d.tipoItem].contagem += 1;
     return acc;
   }, {});
 
   const resumo = Object.entries(totaisPorTipo)
-    .map(([tipo, t]: any) => ({ tipo, ...t }))
+    .map(([tipo, t]) => ({ tipo, ...t }))
     .sort((a, b) => b.quantidade - a.quantidade);
 
   return (
@@ -72,6 +92,7 @@ export function TelaListaDoacoes({ navigation }: any) {
           renderItem={({ item }) => (
             <ItemDoacao
               doacao={item}
+              nomePonto={nomeDoPonto(item.pontoDestino)}
               onPress={() => navigation.navigate('DetalheDoacao', { doacao: item })}
             />
           )}
