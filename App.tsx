@@ -7,8 +7,9 @@ import { TelaDetalhePonto } from './src/screens/TelaDetalhePonto';
 import { TelaCadastroDoacao } from './src/screens/TelaCadastroDoacao';
 import { TelaListaDoacoes } from './src/screens/TelaListaDoacoes';
 import { TelaDetalheDoacao } from './src/screens/TelaDetalheDoacao';
+import { RootStackParamList } from './src/types/navegacao';
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
@@ -33,7 +34,7 @@ export default function App() {
         <Stack.Screen
           name="Cadastro"
           component={TelaCadastroDoacao}
-          options={({ route }: any) => ({
+          options={({ route }) => ({
             title: route.params?.doacaoParaEditar ? 'Editar Doação' : 'Cadastrar Doação',
           })}
         />
