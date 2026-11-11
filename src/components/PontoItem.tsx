@@ -1,5 +1,5 @@
 import { Text, TouchableOpacity } from 'react-native';
-import { Ponto } from '../types/Ponto';
+import { Ponto } from '../types/ponto';
 import { styles } from '../styles/styles';
 
 export function PontoItem({ ponto, onPress }: { ponto: Ponto; onPress: () => void }) {

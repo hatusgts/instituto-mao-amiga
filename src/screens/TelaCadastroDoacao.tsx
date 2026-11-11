@@ -1,9 +1,14 @@
 import { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { pontosMock } from '../data/pontos';
-import { atualizarDoacao } from '../data/doacoesStorage';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { adicionarDoacao, atualizarDoacao } from '../services/doacoesStorage';
+import { listarPontos } from '../services/pontosService';
+import { Doacao } from '../types/doacao';
+import { RootStackParamList } from '../types/navegacao';
+import { Ponto } from '../types/ponto';
 import { styles } from '../styles/styles';
+
+type Props = NativeStackScreenProps<RootStackParamList, 'Cadastro'>;
 
 type Erros = {
   tipo?: string;
@@ -11,22 +16,21 @@ type Erros = {
   ponto?: string;
 };
 
-const CHAVE_DOACOES = '@instituto_mao_amiga:doacoes';
+export function TelaCadastroDoacao({ route, navigation }: Props) {
+  const doacaoParaEditar = route.params?.doacaoParaEditar;
 
-export function TelaCadastroDoacao({ route, navigation }: any) {
-  const doacaoParaEditar = route?.params?.doacaoParaEditar;
-
-  const [tipo, setTipo] = useState(doacaoParaEditar?.tipo ?? '');
-  const [quantidade, setQuantidade] = useState(doacaoParaEditar?.quantidade ?? '');
-  const [pontoId, setPontoId] = useState(doacaoParaEditar?.pontoId ?? '');
+  const [tipo, setTipo] = useState(doacaoParaEditar ? doacaoParaEditar.tipoItem : '');
+  const [quantidade, setQuantidade] = useState(doacaoParaEditar ? String(doacaoParaEditar.quantidade) : '');
+  const [pontoId, setPontoId] = useState<number | null>(doacaoParaEditar ? doacaoParaEditar.pontoDestino : null);
   const [erros, setErros] = useState<Erros>({});
   const [valido, setValido] = useState(false);
-  const [doacoes, setDoacoes] = useState<any[]>([]);
+  const [pontos, setPontos] = useState<Ponto[]>([]);
+  const [erroPontos, setErroPontos] = useState(false);
 
   useEffect(() => {
-    AsyncStorage.getItem(CHAVE_DOACOES).then((salvo) => {
-      if (salvo) setDoacoes(JSON.parse(salvo));
-    });
+    listarPontos()
+      .then((lista) => setPontos(lista))
+      .catch(() => setErroPontos(true));
   }, []);
 
   function validar() {
@@ -45,7 +49,7 @@ export function TelaCadastroDoacao({ route, navigation }: any) {
       novos.quantidade = 'Quantidade deve ser maior que zero';
     }
 
-    if (!pontoId) {
+    if (pontoId === null) {
       novos.ponto = 'Escolha o ponto de destino';
     }
 
@@ -53,20 +57,28 @@ export function TelaCadastroDoacao({ route, navigation }: any) {
     const ok = Object.keys(novos).length === 0;
     setValido(ok);
 
-    if (ok) {
-      if (doacaoParaEditar) {
-        const doacaoAtualizada = { ...doacaoParaEditar, tipo, quantidade, pontoId };
-        atualizarDoacao(doacaoAtualizada).then(() => {
-          navigation.popTo('DetalheDoacao', { doacao: doacaoAtualizada });
-        });
-      } else {
-        const doacao = { id: Date.now(), tipo, quantidade, pontoId, data: new Date().toISOString() };
-        setDoacoes((atual) => {
-          const novo = [...atual, doacao];
-          AsyncStorage.setItem(CHAVE_DOACOES, JSON.stringify(novo));
-          return novo;
-        });
-      }
+    if (!ok || pontoId === null) {
+      return;
+    }
+
+    if (doacaoParaEditar) {
+      const doacaoAtualizada: Doacao = {
+        ...doacaoParaEditar,
+        tipoItem: tipo,
+        quantidade: Number(qtd),
+        pontoDestino: pontoId,
+      };
+      atualizarDoacao(doacaoAtualizada).then(() => {
+        navigation.popTo('DetalheDoacao', { doacao: doacaoAtualizada });
+      });
+    } else {
+      adicionarDoacao({
+        id: Date.now(),
+        tipoItem: tipo,
+        quantidade: Number(qtd),
+        pontoDestino: pontoId,
+        criadoEm: new Date().toISOString(),
+      });
     }
   }
 
@@ -105,8 +117,11 @@ export function TelaCadastroDoacao({ route, navigation }: any) {
       {erros.quantidade ? <Text style={styles.erro}>{erros.quantidade}</Text> : null}
 
       <Text style={styles.label}>Ponto de destino</Text>
+      {erroPontos ? (
+        <Text style={styles.erro}>Não foi possível carregar os pontos. Verifique se a API está ligada.</Text>
+      ) : null}
       <View>
-        {pontosMock.map((ponto) => (
+        {pontos.map((ponto) => (
           <TouchableOpacity
             key={ponto.id}
             style={[styles.opcaoPonto, pontoId === ponto.id ? styles.opcaoPontoSelecionada : null]}

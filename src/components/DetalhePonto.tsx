@@ -1,5 +1,5 @@
 import { Text, View } from 'react-native';
-import { Ponto } from '../types/Ponto';
+import { Ponto } from '../types/ponto';
 import { styles } from '../styles/styles';
 
 export function DetalhePonto({ ponto }: { ponto: Ponto }) {

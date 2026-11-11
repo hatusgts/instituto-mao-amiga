@@ -1,7 +1,9 @@
 export type Ponto = {
-  id: string;
+  id: number;
   nome: string;
   endereco: string;
   diasHorarios: string;
   recebeDistribui: string;
+  latitude: number;
+  longitude: number;
 };

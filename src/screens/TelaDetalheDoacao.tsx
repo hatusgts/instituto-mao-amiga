@@ -1,12 +1,23 @@
+import { useEffect, useState } from 'react';
 import { Alert, Platform, ScrollView, Text, TouchableOpacity } from 'react-native';
-import { pontosMock } from '../data/pontos';
-import { excluirDoacao } from '../data/doacoesStorage';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { excluirDoacao } from '../services/doacoesStorage';
+import { buscarPonto } from '../services/pontosService';
+import { RootStackParamList } from '../types/navegacao';
 import { styles } from '../styles/styles';
 
-export function TelaDetalheDoacao({ route, navigation }: any) {
+type Props = NativeStackScreenProps<RootStackParamList, 'DetalheDoacao'>;
+
+export function TelaDetalheDoacao({ route, navigation }: Props) {
   const { doacao } = route.params;
-  const ponto = pontosMock.find((p) => p.id === doacao.pontoId);
-  const data = new Date(doacao.data).toLocaleDateString();
+  const [nomePonto, setNomePonto] = useState('Carregando...');
+  const data = new Date(doacao.criadoEm).toLocaleDateString();
+
+  useEffect(() => {
+    buscarPonto(doacao.pontoDestino)
+      .then((ponto) => setNomePonto(ponto.nome))
+      .catch(() => setNomePonto('Ponto ' + doacao.pontoDestino));
+  }, [doacao.pontoDestino]);
 
   async function excluirEVoltar() {
     await excluirDoacao(doacao.id);
@@ -29,9 +40,9 @@ export function TelaDetalheDoacao({ route, navigation }: any) {
 
   return (
     <ScrollView style={styles.scroll} contentContainerStyle={styles.container}>
-      <Text style={styles.titulo}>{doacao.tipo}</Text>
+      <Text style={styles.titulo}>{doacao.tipoItem}</Text>
       <Text style={styles.campo}>Quantidade: {doacao.quantidade}</Text>
-      <Text style={styles.campo}>Destino: {ponto ? ponto.nome : 'Ponto não encontrado'}</Text>
+      <Text style={styles.campo}>Destino: {nomePonto}</Text>
       <Text style={styles.campo}>Data: {data}</Text>
 
       <TouchableOpacity
