@@ -7,6 +7,8 @@ import br.com.maoamiga.api.repository.PontoRepository;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,6 +21,10 @@ public class PontoService {
 
     public List<PontoResponseDTO> listar() {
         return repository.findAll().stream().map(PontoResponseDTO::from).toList();
+    }
+
+    public Page<PontoResponseDTO> filtrar(String filtro, Pageable pageable) {
+        return repository.buscar(filtro.trim(), pageable).map(PontoResponseDTO::from);
     }
 
     public PontoResponseDTO buscar(UUID id) {
