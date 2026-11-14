@@ -34,9 +34,9 @@ export function TelaListaDoacoes({ navigation }: Props) {
       .catch(() => setPontos([]));
   }, []);
 
-  function nomeDoPonto(id: number) {
+  function nomeDoPonto(id: string) {
     const ponto = pontos.find((p) => p.id === id);
-    return ponto ? ponto.nome : 'Ponto ' + id;
+    return ponto ? ponto.nome : 'Ponto indisponível';
   }
 
   if (doacoes.length === 0) {

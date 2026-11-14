@@ -21,7 +21,7 @@ export function TelaCadastroDoacao({ route, navigation }: Props) {
 
   const [tipo, setTipo] = useState(doacaoParaEditar ? doacaoParaEditar.tipoItem : '');
   const [quantidade, setQuantidade] = useState(doacaoParaEditar ? String(doacaoParaEditar.quantidade) : '');
-  const [pontoId, setPontoId] = useState<number | null>(doacaoParaEditar ? doacaoParaEditar.pontoDestino : null);
+  const [pontoId, setPontoId] = useState<string | null>(doacaoParaEditar ? doacaoParaEditar.pontoDestino : null);
   const [erros, setErros] = useState<Erros>({});
   const [valido, setValido] = useState(false);
   const [pontos, setPontos] = useState<Ponto[]>([]);

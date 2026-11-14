@@ -10,6 +10,10 @@ export const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
   },
+  lista: {
+    flex: 1,
+    marginTop: 12,
+  },
   titulo: {
     fontSize: 20,
     fontWeight: 'bold',
