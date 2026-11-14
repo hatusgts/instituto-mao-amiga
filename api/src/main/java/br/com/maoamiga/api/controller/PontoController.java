@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -39,7 +40,7 @@ public class PontoController {
     @GetMapping("/filtro")
     public Page<PontoResponseDTO> filtrar(
             @RequestParam(defaultValue = "") String filtro,
-            @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
+            @ParameterObject @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
         return service.filtrar(filtro, pageable);
     }
 

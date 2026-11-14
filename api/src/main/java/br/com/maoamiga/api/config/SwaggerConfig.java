@@ -12,7 +12,7 @@ public class SwaggerConfig {
     public OpenAPI openAPI() {
         return new OpenAPI().info(new Info()
                 .title("API Instituto Mão Amiga")
-                .description("CRUD de pontos de coleta e distribuição")
+                .description("CRUD de pontos de coleta e distribuição e de doações")
                 .version("v1"));
     }
 }
