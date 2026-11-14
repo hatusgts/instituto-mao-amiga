@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Doacao } from '../types/doacao';
 
-const CHAVE_DOACOES = '@instituto_mao_amiga:doacoes_v2';
+const CHAVE_DOACOES = '@instituto_mao_amiga:doacoes_v3';
 
 export async function listarDoacoes(): Promise<Doacao[]> {
   const salvo = await AsyncStorage.getItem(CHAVE_DOACOES);

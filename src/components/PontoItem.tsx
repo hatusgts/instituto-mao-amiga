@@ -6,6 +6,7 @@ export function PontoItem({ ponto, onPress }: { ponto: Ponto; onPress: () => voi
   return (
     <TouchableOpacity style={styles.itemLista} onPress={onPress}>
       <Text style={styles.itemNome}>{ponto.nome}</Text>
+      <Text style={styles.campo}>{ponto.bairro}</Text>
     </TouchableOpacity>
   );
 }

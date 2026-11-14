@@ -16,7 +16,7 @@ export function TelaDetalheDoacao({ route, navigation }: Props) {
   useEffect(() => {
     buscarPonto(doacao.pontoDestino)
       .then((ponto) => setNomePonto(ponto.nome))
-      .catch(() => setNomePonto('Ponto ' + doacao.pontoDestino));
+      .catch(() => setNomePonto('Ponto indisponível'));
   }, [doacao.pontoDestino]);
 
   async function excluirEVoltar() {
