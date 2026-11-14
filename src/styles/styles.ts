@@ -14,6 +14,14 @@ export const styles = StyleSheet.create({
     flex: 1,
     marginTop: 12,
   },
+  linha: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  opcaoTipo: {
+    flex: 1,
+    alignItems: 'center',
+  },
   titulo: {
     fontSize: 20,
     fontWeight: 'bold',
