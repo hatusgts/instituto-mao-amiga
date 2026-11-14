@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { PontoItem } from '../components/PontoItem';
 import { buscarPagina } from '../services/pontosService';
@@ -20,6 +21,7 @@ export function TelaListaPontos({ navigation }: Props) {
   const proximaPagina = useRef(0);
   const totalPaginas = useRef(1);
   const ocupado = useRef(false);
+  const primeiroFoco = useRef(true);
 
   async function carregarPagina(filtro: string, pagina: number) {
     ocupado.current = true;
@@ -67,9 +69,22 @@ export function TelaListaPontos({ navigation }: Props) {
     return () => clearTimeout(espera);
   }, [busca]);
 
+  useFocusEffect(
+    useCallback(() => {
+      if (primeiroFoco.current) {
+        primeiroFoco.current = false;
+        return;
+      }
+      iniciarBusca(filtroAtual.current);
+    }, [])
+  );
+
   return (
     <View style={[styles.scroll, styles.container]}>
       <Text style={styles.titulo}>Pontos de Coleta e Distribuição</Text>
+      <TouchableOpacity style={styles.botaoSecundario} onPress={() => navigation.navigate('FormularioPonto')}>
+        <Text style={styles.botaoSecundarioTexto}>Cadastrar ponto</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.botaoSecundario} onPress={() => navigation.navigate('Cadastro')}>
         <Text style={styles.botaoSecundarioTexto}>Cadastrar doação</Text>
       </TouchableOpacity>

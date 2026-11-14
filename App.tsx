@@ -7,6 +7,7 @@ import { TelaDetalhePonto } from './src/screens/TelaDetalhePonto';
 import { TelaCadastroDoacao } from './src/screens/TelaCadastroDoacao';
 import { TelaListaDoacoes } from './src/screens/TelaListaDoacoes';
 import { TelaDetalheDoacao } from './src/screens/TelaDetalheDoacao';
+import { TelaFormularioPonto } from './src/screens/TelaFormularioPonto';
 import { RootStackParamList } from './src/types/navegacao';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -31,6 +32,13 @@ export default function App() {
       >
         <Stack.Screen name="Lista" component={TelaListaPontos} options={{ title: 'Pontos' }} />
         <Stack.Screen name="Detalhe" component={TelaDetalhePonto} options={{ title: 'Detalhe do Ponto' }} />
+        <Stack.Screen
+          name="FormularioPonto"
+          component={TelaFormularioPonto}
+          options={({ route }) => ({
+            title: route.params?.ponto ? 'Editar Ponto' : 'Cadastrar Ponto',
+          })}
+        />
         <Stack.Screen
           name="Cadastro"
           component={TelaCadastroDoacao}
