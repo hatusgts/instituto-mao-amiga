@@ -1,6 +1,6 @@
 API Instituto Mão Amiga
 
-API do Instituto Mão Amiga com o CRUD dos pontos de coleta e distribuição.
+API do Instituto Mão Amiga com o CRUD dos pontos de coleta e distribuição e das doações.
 Feita com Spring Boot, Spring Data JPA, H2 (gravando em arquivo, na pasta data/), Lombok, Bean Validation e Swagger (springdoc-openapi).
 
 Para rodar: ./mvnw spring-boot:run
@@ -286,3 +286,41 @@ GET http://localhost:8080/api/v1/pontos/filtro?page=1
   }
 }
 ```
+
+
+Doações
+
+GET http://localhost:8080/api/v1/doacoes/filtro?filtro=...&page=0&size=10
+Procura pelo tipo de item, sem diferenciar maiúsculas. Sem filtro, devolve todas.
+Por padrão vem 10 por página, da mais nova para a mais antiga.
+![GET doações filtro](docs/prints/09-doacoes-filtro.png)
+
+GET http://localhost:8080/api/v1/doacoes/{id}
+Busca uma doação pelo id. Responde 200, ou 404 se o id não existir.
+![GET doação por id](docs/prints/10-doacoes-get-por-id.png)
+![GET doação inexistente - 404](docs/prints/11-doacoes-get-404.png)
+
+POST http://localhost:8080/api/v1/doacoes
+Cadastra uma doação. Responde 201, ou 400 se o tipo estiver vazio ou a quantidade for zero ou negativa (e nada é gravado).
+A data de cadastro (criadoEm) é preenchida pela API e não muda na edição.
+![POST doação](docs/prints/12-doacoes-post.png)
+![POST doação com quantidade zero - 400](docs/prints/13-doacoes-post-400.png)
+
+PUT http://localhost:8080/api/v1/doacoes/{id}
+Edita uma doação. Responde 200, 404 se o id não existir, ou 400 se algum campo for inválido.
+![PUT doação](docs/prints/14-doacoes-put.png)
+![PUT doação inexistente - 404](docs/prints/15-doacoes-put-404.png)
+
+DELETE http://localhost:8080/api/v1/doacoes/{id}
+Exclui uma doação. Responde 204, ou 404 se o id não existir.
+![DELETE doação](docs/prints/16-doacoes-delete.png)
+
+Exemplo de corpo para POST e PUT
+
+{
+  "tipoItem": "Arroz",
+  "quantidade": 10,
+  "pontoDestino": "Ponto Praça Cívica"
+}
+
+tipoItem e pontoDestino são obrigatórios. quantidade é obrigatória e deve ser maior que zero.
