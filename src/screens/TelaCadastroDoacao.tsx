@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { adicionarDoacao, atualizarDoacao } from '../services/doacoesStorage';
+import { ErroApi } from '../services/api';
+import { cadastrarDoacao } from '../services/doacoesService';
 import { listarPontos } from '../services/pontosService';
-import { Doacao } from '../types/doacao';
 import { RootStackParamList } from '../types/navegacao';
 import { Ponto } from '../types/ponto';
 import { styles } from '../styles/styles';
@@ -16,16 +16,15 @@ type Erros = {
   ponto?: string;
 };
 
-export function TelaCadastroDoacao({ route, navigation }: Props) {
-  const doacaoParaEditar = route.params?.doacaoParaEditar;
-
-  const [tipo, setTipo] = useState(doacaoParaEditar ? doacaoParaEditar.tipoItem : '');
-  const [quantidade, setQuantidade] = useState(doacaoParaEditar ? String(doacaoParaEditar.quantidade) : '');
-  const [pontoId, setPontoId] = useState<string | null>(doacaoParaEditar ? doacaoParaEditar.pontoDestino : null);
+export function TelaCadastroDoacao({ navigation }: Props) {
+  const [tipo, setTipo] = useState('');
+  const [quantidade, setQuantidade] = useState('');
+  const [pontoEscolhido, setPontoEscolhido] = useState<Ponto | null>(null);
   const [erros, setErros] = useState<Erros>({});
-  const [valido, setValido] = useState(false);
   const [pontos, setPontos] = useState<Ponto[]>([]);
   const [erroPontos, setErroPontos] = useState(false);
+  const [erroEnvio, setErroEnvio] = useState('');
+  const [enviando, setEnviando] = useState(false);
 
   useEffect(() => {
     listarPontos()
@@ -33,7 +32,7 @@ export function TelaCadastroDoacao({ route, navigation }: Props) {
       .catch(() => setErroPontos(true));
   }, []);
 
-  function validar() {
+  async function validar() {
     const novos: Erros = {};
 
     if (!tipo.trim()) {
@@ -49,44 +48,34 @@ export function TelaCadastroDoacao({ route, navigation }: Props) {
       novos.quantidade = 'Quantidade deve ser maior que zero';
     }
 
-    if (pontoId === null) {
+    if (pontoEscolhido === null) {
       novos.ponto = 'Escolha o ponto de destino';
     }
 
     setErros(novos);
-    const ok = Object.keys(novos).length === 0;
-    setValido(ok);
+    setErroEnvio('');
 
-    if (!ok || pontoId === null) {
+    if (Object.keys(novos).length > 0 || pontoEscolhido === null) {
       return;
     }
 
-    if (doacaoParaEditar) {
-      const doacaoAtualizada: Doacao = {
-        ...doacaoParaEditar,
-        tipoItem: tipo,
+    setEnviando(true);
+    try {
+      await cadastrarDoacao({
+        tipoItem: tipo.trim(),
         quantidade: Number(qtd),
-        pontoDestino: pontoId,
-      };
-      atualizarDoacao(doacaoAtualizada).then(() => {
-        navigation.popTo('DetalheDoacao', { doacao: doacaoAtualizada });
+        pontoDestino: pontoEscolhido.nome,
       });
-    } else {
-      adicionarDoacao({
-        id: Date.now(),
-        tipoItem: tipo,
-        quantidade: Number(qtd),
-        pontoDestino: pontoId,
-        criadoEm: new Date().toISOString(),
-      });
+      navigation.goBack();
+    } catch (e) {
+      setErroEnvio(
+        e instanceof ErroApi
+          ? 'A API recusou a doação. Confira os dados e tente novamente.'
+          : 'Não foi possível enviar a doação. Verifique se a API está ligada.'
+      );
+    } finally {
+      setEnviando(false);
     }
-  }
-
-  function alterar(set: (valor: string) => void) {
-    return (valor: string) => {
-      set(valor);
-      setValido(false);
-    };
   }
 
   return (
@@ -95,13 +84,13 @@ export function TelaCadastroDoacao({ route, navigation }: Props) {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.titulo}>{doacaoParaEditar ? 'Editar Doação' : 'Cadastrar Doação'}</Text>
+      <Text style={styles.titulo}>Cadastrar Doação</Text>
 
       <Text style={styles.label}>Tipo do item</Text>
       <TextInput
         style={[styles.input, erros.tipo ? styles.inputErro : null]}
         value={tipo}
-        onChangeText={alterar(setTipo)}
+        onChangeText={setTipo}
         placeholder="Ex: arroz, agasalho, leite"
       />
       {erros.tipo ? <Text style={styles.erro}>{erros.tipo}</Text> : null}
@@ -110,7 +99,7 @@ export function TelaCadastroDoacao({ route, navigation }: Props) {
       <TextInput
         style={[styles.input, erros.quantidade ? styles.inputErro : null]}
         value={quantidade}
-        onChangeText={alterar(setQuantidade)}
+        onChangeText={setQuantidade}
         keyboardType="numeric"
         placeholder="Ex: 10"
       />
@@ -124,13 +113,10 @@ export function TelaCadastroDoacao({ route, navigation }: Props) {
         {pontos.map((ponto) => (
           <TouchableOpacity
             key={ponto.id}
-            style={[styles.opcaoPonto, pontoId === ponto.id ? styles.opcaoPontoSelecionada : null]}
-            onPress={() => {
-              setPontoId(ponto.id);
-              setValido(false);
-            }}
+            style={[styles.opcaoPonto, pontoEscolhido?.id === ponto.id ? styles.opcaoPontoSelecionada : null]}
+            onPress={() => setPontoEscolhido(ponto)}
           >
-            <Text style={pontoId === ponto.id ? styles.opcaoPontoTextoSelecionado : styles.opcaoPontoTexto}>
+            <Text style={pontoEscolhido?.id === ponto.id ? styles.opcaoPontoTextoSelecionado : styles.opcaoPontoTexto}>
               {ponto.nome}
             </Text>
           </TouchableOpacity>
@@ -138,17 +124,11 @@ export function TelaCadastroDoacao({ route, navigation }: Props) {
       </View>
       {erros.ponto ? <Text style={styles.erro}>{erros.ponto}</Text> : null}
 
-      {valido ? <Text style={styles.sucesso}>Formulário válido</Text> : null}
+      {erroEnvio ? <Text style={styles.erro}>{erroEnvio}</Text> : null}
 
-      <TouchableOpacity style={styles.botao} onPress={validar}>
-        <Text style={styles.botaoTexto}>{doacaoParaEditar ? 'Salvar alterações' : 'Cadastrar doação'}</Text>
+      <TouchableOpacity style={styles.botao} onPress={validar} disabled={enviando}>
+        <Text style={styles.botaoTexto}>{enviando ? 'Enviando...' : 'Cadastrar doação'}</Text>
       </TouchableOpacity>
-
-      {doacaoParaEditar ? (
-        <TouchableOpacity style={styles.botaoSecundario} onPress={() => navigation.goBack()}>
-          <Text style={styles.botaoSecundarioTexto}>Cancelar</Text>
-        </TouchableOpacity>
-      ) : null}
     </ScrollView>
     </KeyboardAvoidingView>
   );

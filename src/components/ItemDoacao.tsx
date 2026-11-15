@@ -5,17 +5,16 @@ import { styles } from '../styles/styles';
 
 type Props = {
   doacao: Doacao;
-  nomePonto: string;
   onPress: () => void;
 };
 
-function ItemDoacaoBase({ doacao, nomePonto, onPress }: Props) {
+function ItemDoacaoBase({ doacao, onPress }: Props) {
   const data = new Date(doacao.criadoEm).toLocaleDateString();
 
   return (
     <TouchableOpacity style={styles.itemLista} onPress={onPress}>
       <Text style={styles.itemNome}>{doacao.tipoItem} - {doacao.quantidade}</Text>
-      <Text style={styles.campo}>Destino: {nomePonto}</Text>
+      <Text style={styles.campo}>Destino: {doacao.pontoDestino}</Text>
       <Text style={styles.campo}>Data: {data}</Text>
     </TouchableOpacity>
   );

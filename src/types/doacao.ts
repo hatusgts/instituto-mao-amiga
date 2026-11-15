@@ -1,7 +1,13 @@
 export type Doacao = {
-  id: number;
+  id: string;
   tipoItem: string;
   quantidade: number;
   pontoDestino: string;
   criadoEm: string;
+};
+
+export type DoacaoRequest = {
+  tipoItem: string;
+  quantidade: number;
+  pontoDestino: string;
 };

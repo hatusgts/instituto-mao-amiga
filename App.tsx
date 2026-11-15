@@ -39,13 +39,7 @@ export default function App() {
             title: route.params?.ponto ? 'Editar Ponto' : 'Cadastrar Ponto',
           })}
         />
-        <Stack.Screen
-          name="Cadastro"
-          component={TelaCadastroDoacao}
-          options={({ route }) => ({
-            title: route.params?.doacaoParaEditar ? 'Editar Doação' : 'Cadastrar Doação',
-          })}
-        />
+        <Stack.Screen name="Cadastro" component={TelaCadastroDoacao} options={{ title: 'Cadastrar Doação' }} />
         <Stack.Screen name="Doacoes" component={TelaListaDoacoes} options={{ title: 'Minhas Doações' }} />
         <Stack.Screen name="DetalheDoacao" component={TelaDetalheDoacao} options={{ title: 'Detalhe da Doação' }} />
       </Stack.Navigator>
