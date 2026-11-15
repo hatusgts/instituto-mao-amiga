@@ -40,6 +40,25 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  linhaPonto: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  infoPonto: {
+    flex: 1,
+    minHeight: 44,
+    justifyContent: 'center',
+  },
+  botaoFavorito: {
+    minWidth: 44,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  favoritoTexto: {
+    fontSize: 24,
+    color: '#C0392B',
+  },
   nome: {
     fontSize: 22,
     fontWeight: 'bold',

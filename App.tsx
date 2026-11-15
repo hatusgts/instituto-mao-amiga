@@ -8,6 +8,7 @@ import { TelaCadastroDoacao } from './src/screens/TelaCadastroDoacao';
 import { TelaListaDoacoes } from './src/screens/TelaListaDoacoes';
 import { TelaDetalheDoacao } from './src/screens/TelaDetalheDoacao';
 import { TelaFormularioPonto } from './src/screens/TelaFormularioPonto';
+import { TelaMeusPontos } from './src/screens/TelaMeusPontos';
 import { RootStackParamList } from './src/types/navegacao';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -31,6 +32,7 @@ export default function App() {
         })}
       >
         <Stack.Screen name="Lista" component={TelaListaPontos} options={{ title: 'Pontos' }} />
+        <Stack.Screen name="MeusPontos" component={TelaMeusPontos} options={{ title: 'Meus Pontos' }} />
         <Stack.Screen name="Detalhe" component={TelaDetalhePonto} options={{ title: 'Detalhe do Ponto' }} />
         <Stack.Screen
           name="FormularioPonto"
