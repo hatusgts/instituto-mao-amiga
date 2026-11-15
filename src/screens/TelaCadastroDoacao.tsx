@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ErroApi } from '../services/api';
-import { cadastrarDoacao } from '../services/doacoesService';
+import { cadastrarDoacao, editarDoacao } from '../services/doacoesService';
 import { listarPontos } from '../services/pontosService';
 import { RootStackParamList } from '../types/navegacao';
 import { Ponto } from '../types/ponto';
@@ -16,10 +16,12 @@ type Erros = {
   ponto?: string;
 };
 
-export function TelaCadastroDoacao({ navigation }: Props) {
-  const [tipo, setTipo] = useState('');
-  const [quantidade, setQuantidade] = useState('');
-  const [pontoEscolhido, setPontoEscolhido] = useState<Ponto | null>(null);
+export function TelaCadastroDoacao({ route, navigation }: Props) {
+  const doacaoParaEditar = route.params?.doacao;
+
+  const [tipo, setTipo] = useState(doacaoParaEditar ? doacaoParaEditar.tipoItem : '');
+  const [quantidade, setQuantidade] = useState(doacaoParaEditar ? String(doacaoParaEditar.quantidade) : '');
+  const [pontoDestino, setPontoDestino] = useState<string | null>(doacaoParaEditar ? doacaoParaEditar.pontoDestino : null);
   const [erros, setErros] = useState<Erros>({});
   const [pontos, setPontos] = useState<Ponto[]>([]);
   const [erroPontos, setErroPontos] = useState(false);
@@ -48,31 +50,38 @@ export function TelaCadastroDoacao({ navigation }: Props) {
       novos.quantidade = 'Quantidade deve ser maior que zero';
     }
 
-    if (pontoEscolhido === null) {
+    if (pontoDestino === null) {
       novos.ponto = 'Escolha o ponto de destino';
     }
 
     setErros(novos);
     setErroEnvio('');
 
-    if (Object.keys(novos).length > 0 || pontoEscolhido === null) {
+    if (Object.keys(novos).length > 0 || pontoDestino === null) {
       return;
     }
 
     setEnviando(true);
     try {
-      await cadastrarDoacao({
+      const dados = {
         tipoItem: tipo.trim(),
         quantidade: Number(qtd),
-        pontoDestino: pontoEscolhido.nome,
-      });
+        pontoDestino,
+      };
+      if (doacaoParaEditar) {
+        await editarDoacao(doacaoParaEditar.id, dados);
+      } else {
+        await cadastrarDoacao(dados);
+      }
       navigation.goBack();
     } catch (e) {
-      setErroEnvio(
-        e instanceof ErroApi
-          ? 'A API recusou a doação. Confira os dados e tente novamente.'
-          : 'Não foi possível enviar a doação. Verifique se a API está ligada.'
-      );
+      if (e instanceof ErroApi && e.status === 404) {
+        setErroEnvio('Doação não encontrada. Ela pode ter sido excluída.');
+      } else if (e instanceof ErroApi) {
+        setErroEnvio('A API recusou a doação. Confira os dados e tente novamente.');
+      } else {
+        setErroEnvio('Não foi possível enviar a doação. Verifique se a API está ligada.');
+      }
     } finally {
       setEnviando(false);
     }
@@ -84,7 +93,7 @@ export function TelaCadastroDoacao({ navigation }: Props) {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.titulo}>Cadastrar Doação</Text>
+      <Text style={styles.titulo}>{doacaoParaEditar ? 'Editar Doação' : 'Cadastrar Doação'}</Text>
 
       <Text style={styles.label}>Tipo do item</Text>
       <TextInput
@@ -113,10 +122,10 @@ export function TelaCadastroDoacao({ navigation }: Props) {
         {pontos.map((ponto) => (
           <TouchableOpacity
             key={ponto.id}
-            style={[styles.opcaoPonto, pontoEscolhido?.id === ponto.id ? styles.opcaoPontoSelecionada : null]}
-            onPress={() => setPontoEscolhido(ponto)}
+            style={[styles.opcaoPonto, pontoDestino === ponto.nome ? styles.opcaoPontoSelecionada : null]}
+            onPress={() => setPontoDestino(ponto.nome)}
           >
-            <Text style={pontoEscolhido?.id === ponto.id ? styles.opcaoPontoTextoSelecionado : styles.opcaoPontoTexto}>
+            <Text style={pontoDestino === ponto.nome ? styles.opcaoPontoTextoSelecionado : styles.opcaoPontoTexto}>
               {ponto.nome}
             </Text>
           </TouchableOpacity>
@@ -127,8 +136,14 @@ export function TelaCadastroDoacao({ navigation }: Props) {
       {erroEnvio ? <Text style={styles.erro}>{erroEnvio}</Text> : null}
 
       <TouchableOpacity style={styles.botao} onPress={validar} disabled={enviando}>
-        <Text style={styles.botaoTexto}>{enviando ? 'Enviando...' : 'Cadastrar doação'}</Text>
+        <Text style={styles.botaoTexto}>{enviando ? 'Enviando...' : doacaoParaEditar ? 'Salvar alterações' : 'Cadastrar doação'}</Text>
       </TouchableOpacity>
+
+      {doacaoParaEditar ? (
+        <TouchableOpacity style={styles.botaoSecundario} onPress={() => navigation.goBack()}>
+          <Text style={styles.botaoSecundarioTexto}>Cancelar</Text>
+        </TouchableOpacity>
+      ) : null}
     </ScrollView>
     </KeyboardAvoidingView>
   );
