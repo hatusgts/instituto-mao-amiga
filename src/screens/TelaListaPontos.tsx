@@ -3,6 +3,7 @@ import { ActivityIndicator, FlatList, Text, TextInput, TouchableOpacity, View } 
 import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { PontoItem } from '../components/PontoItem';
+import { alternarFavorito, listarFavoritos } from '../services/favoritosStorage';
 import { buscarPagina } from '../services/pontosService';
 import { RootStackParamList } from '../types/navegacao';
 import { Ponto } from '../types/ponto';
@@ -16,6 +17,7 @@ export function TelaListaPontos({ navigation }: Props) {
   const [carregando, setCarregando] = useState(true);
   const [carregandoMais, setCarregandoMais] = useState(false);
   const [erro, setErro] = useState(false);
+  const [favoritos, setFavoritos] = useState<string[]>([]);
 
   const filtroAtual = useRef('');
   const proximaPagina = useRef(0);
@@ -71,6 +73,7 @@ export function TelaListaPontos({ navigation }: Props) {
 
   useFocusEffect(
     useCallback(() => {
+      listarFavoritos().then(setFavoritos);
       if (primeiroFoco.current) {
         primeiroFoco.current = false;
         return;
@@ -78,6 +81,10 @@ export function TelaListaPontos({ navigation }: Props) {
       iniciarBusca(filtroAtual.current);
     }, [])
   );
+
+  async function favoritar(id: string) {
+    setFavoritos(await alternarFavorito(id));
+  }
 
   return (
     <View style={[styles.scroll, styles.container]}>
@@ -90,6 +97,9 @@ export function TelaListaPontos({ navigation }: Props) {
       </TouchableOpacity>
       <TouchableOpacity style={styles.botaoSecundario} onPress={() => navigation.navigate('Doacoes')}>
         <Text style={styles.botaoSecundarioTexto}>Ver Minhas Doações</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.botaoSecundario} onPress={() => navigation.navigate('MeusPontos')}>
+        <Text style={styles.botaoSecundarioTexto}>Meus pontos</Text>
       </TouchableOpacity>
 
       <TextInput
@@ -119,6 +129,7 @@ export function TelaListaPontos({ navigation }: Props) {
         <FlatList
           style={styles.lista}
           data={pontos}
+          extraData={favoritos}
           keyExtractor={(ponto) => ponto.id}
           onEndReached={carregarMais}
           onEndReachedThreshold={0.5}
@@ -127,7 +138,9 @@ export function TelaListaPontos({ navigation }: Props) {
           renderItem={({ item }) => (
             <PontoItem
               ponto={item}
+              favorito={favoritos.includes(item.id)}
               onPress={() => navigation.navigate('Detalhe', { id: item.id })}
+              onFavoritar={() => favoritar(item.id)}
             />
           )}
         />
