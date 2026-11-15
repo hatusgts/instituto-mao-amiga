@@ -5,7 +5,7 @@ export type RootStackParamList = {
   Lista: undefined;
   Detalhe: { id: string };
   FormularioPonto: { ponto?: Ponto } | undefined;
-  Cadastro: undefined;
+  Cadastro: { doacao?: Doacao } | undefined;
   Doacoes: undefined;
-  DetalheDoacao: { doacao: Doacao };
+  DetalheDoacao: { id: string };
 };

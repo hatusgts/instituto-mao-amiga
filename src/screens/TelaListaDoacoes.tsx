@@ -125,7 +125,7 @@ export function TelaListaDoacoes({ navigation }: Props) {
           renderItem={({ item }) => (
             <ItemDoacao
               doacao={item}
-              onPress={() => navigation.navigate('DetalheDoacao', { doacao: item })}
+              onPress={() => navigation.navigate('DetalheDoacao', { id: item.id })}
             />
           )}
         />
